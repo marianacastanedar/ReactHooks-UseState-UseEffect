@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import './App.css'
 
 function Pomodoro() {
   const [workMins, setWorkMins] = useState(25);
@@ -48,7 +49,7 @@ function Pomodoro() {
     try {
       new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play();
     } catch (error) {
-      
+
     }
   }, [timeLeft]);
 
@@ -95,11 +96,12 @@ function Pomodoro() {
   }
 
   return (
-    <div>
-      <div>
-        <label>
-          Trabajo (min):
+    <div className="pomodoro">
+      <div className="pomodoro__config">
+        <label className="pomodoro__config-label">
+          Trabajo (min)
           <input
+            className="pomodoro__input"
             type="number"
             min={1}
             max={60}
@@ -108,9 +110,10 @@ function Pomodoro() {
             onChange={handleWorkMins}
           />
         </label>
-        <label>
-          Descanso (min):
+        <label className="pomodoro__config-label">
+          Descanso (min)
           <input
+            className="pomodoro__input"
             type="number"
             min={1}
             max={60}
@@ -121,37 +124,57 @@ function Pomodoro() {
         </label>
       </div>
 
-      <p>{mode === 'work' ? 'Trabajo' : 'Descanso'}</p>
-      <h1>{formatTime(timeLeft)}</h1>
+      <p className={`pomodoro__mode pomodoro__mode--${mode}`}>
+        {mode === 'work' ? 'TRABAJO' : 'DESCANSO'}
+      </p>
 
-      <div style={{ width: 300, background: '#ddd', borderRadius: 4, overflow: 'hidden' }}>
+      <div className="pomodoro__clock">
+        <h1 className="pomodoro__time">{formatTime(timeLeft)}</h1>
+      </div>
+
+      <div className="pomodoro__progress-track">
         <div
+          className="pomodoro__progress-fill"
           style={{
             width: `${progress}%`,
-            height: 12,
-            background: mode === 'work' ? '#e74c3c' : '#2ecc71',
-            transition: 'width 1s linear',
+            background: mode === 'work' ? '#4a9ece' : '#90c4e4',
           }}
         />
       </div>
 
-      <div>
-        <button onClick={toggleTimer}>{isRunning ? 'Pausar' : 'Iniciar'}</button>
-        <button onClick={resetTimer}>Reiniciar</button>
-        <button onClick={savePartial} disabled={!isRunning && timeLeft === totalTime}>
-          Guardar sesión
+      <div className="pomodoro__controls">
+        <button className="pomodoro__btn pomodoro__btn--primary" onClick={toggleTimer}>
+          {isRunning ? 'Pausar' : 'Iniciar'}
+        </button>
+        <button className="pomodoro__btn pomodoro__btn--secondary" onClick={resetTimer}>
+          Reiniciar
+        </button>
+        <button
+          className="pomodoro__btn pomodoro__btn--outline"
+          onClick={savePartial}
+          disabled={!isRunning && timeLeft === totalTime}
+        >
+          Guardar parcial
         </button>
       </div>
 
-      <div>
-        <p>Sesiones completadas: {completedWork.length}</p>
-        <p>Tiempo total trabajado: {formatTime(totalWorkSecs)}</p>
+      <div className="pomodoro__stats">
+        <div className="pomodoro__stat">
+          <span className="pomodoro__stat-value">{completedWork.length}</span>
+          <span className="pomodoro__stat-label">Sesiones</span>
+        </div>
+        <div className="pomodoro__stat">
+          <span className="pomodoro__stat-value pomodoro__stat-value--time">
+            {formatTime(totalWorkSecs)}
+          </span>
+          <span className="pomodoro__stat-label">Tiempo total</span>
+        </div>
       </div>
 
-      <ul>
+      <ul className="pomodoro__history">
         {sessions.map((session, index) => (
-          <li key={session.id}>
-            Sesión {index + 1} ({session.type}) — {formatTime(session.duration)} —{' '}
+          <li key={session.id} className="pomodoro__history-item">
+            Sesion {index + 1} ({session.type}) — {formatTime(session.duration)} —{' '}
             {session.completedAt.toLocaleTimeString()}
           </li>
         ))}
