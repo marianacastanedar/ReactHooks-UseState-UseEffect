@@ -1,10 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 
+const WORK_TIME = 1500;
+const BREAK_TIME = 300;
+
 function Pomodoro() {
-  const [timeLeft, setTimeLeft] = useState(1500);
+  const [timeLeft, setTimeLeft] = useState(WORK_TIME);
   const [isRunning, setIsRunning] = useState(false);
+  const [mode, setMode] = useState('work');
+  const [sessions, setSessions] = useState([]);
   const intervalRef = useRef(null);
 
+  // cuenta regresiva
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
       intervalRef.current = setInterval(() => {
@@ -12,12 +18,25 @@ function Pomodoro() {
       }, 1000);
     }
 
-    if (timeLeft === 0) {
-      setIsRunning(false);
-    }
-
     return () => clearInterval(intervalRef.current);
   }, [isRunning, timeLeft]);
+
+  // cambio de modo cuando es 0
+  useEffect(() => {
+    if (timeLeft !== 0) return;
+
+    if (mode === 'work') {
+      setSessions(prev => [
+        ...prev,
+        { id: Date.now(), type: 'work', duration: WORK_TIME, completedAt: new Date() },
+      ]);
+    }
+
+    const nextMode = mode === 'work' ? 'break' : 'work';
+    setMode(nextMode);
+    setTimeLeft(nextMode === 'work' ? WORK_TIME : BREAK_TIME);
+    setIsRunning(true);
+  }, [timeLeft]);
 
   function formatTime(segundos) {
     const minutes = Math.floor(segundos / 60);
@@ -31,14 +50,26 @@ function Pomodoro() {
 
   function resetTimer() {
     setIsRunning(false);
-    setTimeLeft(1500);
+    setTimeLeft(WORK_TIME);
+    setMode('work');
+    setSessions([]);
   }
 
   return (
     <div>
+      <p>{mode === 'work' ? 'Trabajo' : 'Descanso'}</p>
       <h1>{formatTime(timeLeft)}</h1>
       <button onClick={toggleTimer}>{isRunning ? 'Pausar' : 'Iniciar'}</button>
       <button onClick={resetTimer}>Reiniciar</button>
+
+      <ul>
+        {sessions.map((session, index) => (
+          <li key={session.id}>
+            Sesión {index + 1} — {formatTime(session.duration)} —{' '}
+            {session.completedAt.toLocaleTimeString()}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
