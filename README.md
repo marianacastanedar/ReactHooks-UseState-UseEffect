@@ -32,3 +32,5 @@ npm run dev
 3. El timer cambia automaticamente entre trabajo y descanso
 4. Usa **Guardar parcial** para registrar tiempo sin esperar al final
 5. **Reiniciar** resetea todo al estado inicial
+6. **Link al video:** https://youtu.be/3FJubYlGZnU
+
